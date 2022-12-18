@@ -45,15 +45,9 @@
     }
   },
 
-  local graalvm8 = {
-    downloads+: {
-      JAVA_HOME: { name: 'graalvm-ce-java8', version: '21.3.0', platformspecific: true },
-    },
-  },
-
   local graalvm11 = {
     downloads+: {
-      JAVA_HOME: { name: 'graalvm-ce-java11', version: '21.3.0', platformspecific: true },
+      JAVA_HOME: { name: 'graalvm-ce-java11', version: '22.3.0', platformspecific: true },
     },
   },
 
@@ -62,6 +56,10 @@
     packages+: {
       maven: '==3.3.9',
       devtoolset: "==7",  # GCC 7.3.1, make 4.2.1, binutils 2.28, valgrind 3.13.0
+    },
+    docker: {
+      image: "buildslave_ol7",
+      mount_modules: true,
     },
   },
 

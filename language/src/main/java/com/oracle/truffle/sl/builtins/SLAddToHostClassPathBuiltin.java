@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * The Universal Permissive License (UPL), Version 1.0
@@ -38,27 +38,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.oracle.truffle.sl.nodes.expression;
+package com.oracle.truffle.sl.builtins;
 
-import com.oracle.truffle.api.frame.VirtualFrame;
+import com.oracle.truffle.api.CompilerDirectives;
+import com.oracle.truffle.api.TruffleFile;
+import com.oracle.truffle.api.TruffleLanguage;
+import com.oracle.truffle.api.dsl.Cached;
+import com.oracle.truffle.api.dsl.Specialization;
 import com.oracle.truffle.api.nodes.NodeInfo;
 import com.oracle.truffle.api.strings.TruffleString;
-import com.oracle.truffle.sl.nodes.SLExpressionNode;
+import com.oracle.truffle.sl.runtime.SLContext;
+import com.oracle.truffle.sl.runtime.SLNull;
 
 /**
- * Constant literal for a String value.
+ * Builtin function that performs context exit.
  */
-@NodeInfo(shortName = "const")
-public final class SLStringLiteralNode extends SLExpressionNode {
+@NodeInfo(shortName = "addToHostClassPath")
+public abstract class SLAddToHostClassPathBuiltin extends SLBuiltinNode {
 
-    private final TruffleString value;
-
-    public SLStringLiteralNode(TruffleString value) {
-        this.value = value;
+    @Specialization
+    protected Object execute(TruffleString classPath,
+                    @Cached TruffleString.ToJavaStringNode toJavaStringNode) {
+        addToHostClassPath(toJavaStringNode.execute(classPath));
+        return SLNull.SINGLETON;
     }
 
-    @Override
-    public TruffleString executeGeneric(VirtualFrame frame) {
-        return value;
+    @CompilerDirectives.TruffleBoundary
+    private void addToHostClassPath(String classPath) {
+        TruffleLanguage.Env env = SLContext.get(this).getEnv();
+        TruffleFile file = env.getPublicTruffleFile(classPath);
+        env.addToHostClassPath(file);
     }
 }

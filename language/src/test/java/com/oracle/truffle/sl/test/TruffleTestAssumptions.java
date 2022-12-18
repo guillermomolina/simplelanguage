@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012, 2022, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2021, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * The Universal Permissive License (UPL), Version 1.0
@@ -38,27 +38,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-package com.oracle.truffle.sl.nodes.expression;
+package com.oracle.truffle.sl.test;
 
-import com.oracle.truffle.api.frame.VirtualFrame;
-import com.oracle.truffle.api.nodes.NodeInfo;
-import com.oracle.truffle.api.strings.TruffleString;
-import com.oracle.truffle.sl.nodes.SLExpressionNode;
+import org.junit.Assume;
 
-/**
- * Constant literal for a String value.
- */
-@NodeInfo(shortName = "const")
-public final class SLStringLiteralNode extends SLExpressionNode {
+public class TruffleTestAssumptions {
+    private static final boolean spawnIsolate = "true".equals(System.getProperty("polyglot.engine.SpawnIsolate"));
 
-    private final TruffleString value;
-
-    public SLStringLiteralNode(TruffleString value) {
-        this.value = value;
+    public static void assumeWeakEncapsulation() {
+        Assume.assumeFalse(spawnIsolate);
     }
 
-    @Override
-    public TruffleString executeGeneric(VirtualFrame frame) {
-        return value;
+    public static boolean isWeakEncapsulation() {
+        return !spawnIsolate;
     }
 }
